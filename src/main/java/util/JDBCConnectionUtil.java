@@ -20,6 +20,12 @@ public class JDBCConnectionUtil {
 	String passWord = "Maher123";
 
 	private Connection getConnection() throws SQLException {
+
+		try {
+			Class.forName("oracle.jdbc.OracleDriver");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		Connection con = DriverManager.getConnection(url, userName, passWord);
 		return con;
 	}
@@ -45,7 +51,9 @@ public class JDBCConnectionUtil {
 					servers_services_map.put(server_id, server);
 				} else {
 					Server exisistingServer = servers_services_map.get(server_id);
+
 					exisistingServer.getServices().addAll(fillServices(rs));
+
 				}
 			}
 		}
@@ -59,7 +67,8 @@ public class JDBCConnectionUtil {
 		server.setUrl(rs.getString("URL"));
 		boolean active = rs.getInt("IS_Active") == 1;
 		server.setActive(active);
-		server.setServices(fillServices(rs));
+		if ((Integer) rs.getInt("svc_id") != 0)
+			server.setServices(fillServices(rs));
 
 	}
 
