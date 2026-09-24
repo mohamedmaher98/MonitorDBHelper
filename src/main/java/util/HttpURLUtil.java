@@ -5,36 +5,38 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.MalformedInputException;
+import java.sql.Connection;
 
 public class HttpURLUtil {
 
 	public String urlToText(String urlFromClient) throws IOException {
 		URL url = new URL(urlFromClient);
-
-		HttpURLConnection openConnection = (HttpURLConnection) url.openConnection();
-		openConnection.setConnectTimeout(5000);
-		openConnection.setReadTimeout(5000);
-		int rCode = openConnection.getResponseCode();
-		String rMessageString = openConnection.getResponseMessage();
-		if (openConnection.getResponseCode() != 200) {
-
-			throw new IOException("the message is: " + rMessageString + "the response code is: " + rCode);
-		}
-		try (InputStream inputStream = openConnection.getInputStream();
-				InputStreamReader streamReader = new InputStreamReader(inputStream, "UTF-8");
-				BufferedReader bufferedReader = new BufferedReader(streamReader)) {
-			StringBuilder textBuilder = new StringBuilder();
-			String line;
-			while ((line = bufferedReader.readLine()) != null) {
-				textBuilder.append(line);
-			}
-			if (textBuilder.isEmpty())
-				throw new IOException("there are no data from the server");
-			return textBuilder.toString();
+		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+		connection.setConnectTimeout(5000);
+		connection.setReadTimeout(5000);
+		if (connection.getResponseCode() != 200) {
+			System.out.println("not success");
+			throw new IOException("bad status");
 		}
 
+		try(
+		InputStream stream = connection.getInputStream();
+		InputStreamReader inputStreamReader = new InputStreamReader(stream, "UTF-8");
+		BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+				)
+		{
+		StringBuilder string = new StringBuilder();
+		String line;
+		while ((line = bufferedReader.readLine()) != null) {
+			string.append(line);
+		}
+		return string.toString();
+		}
+		
 	}
 
-	
 }

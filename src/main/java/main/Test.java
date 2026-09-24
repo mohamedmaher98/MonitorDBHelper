@@ -1,12 +1,6 @@
 package main;
 
-import java.sql.SQLException;
-import java.util.List;
-
-import classes.Server;
-import classes.Service;
-import util.HttpURLUtil;
-import util.JDBCConnectionUtil;
+import util.LogUtil;
 
 public class Test {
 
@@ -27,17 +21,20 @@ public class Test {
 		 * System.out.println(e.getMessage()); }
 		 */
 
-		HttpURLUtil urlUtil = new HttpURLUtil();
-		try {
-			
-			System.out.println(urlUtil.urlToText(
-					"https://api.open-meteo.com/v1/forecast?latitude=30.04&longitude=31.24&current=temperature_2m"));
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
-		JDBCConnectionUtil jdbcConnectionUtil = new JDBCConnectionUtil();
+		/*
+		 * HttpURLUtil urlUtil = new HttpURLUtil(); try {
+		 * 
+		 * System.out.println(urlUtil.urlToText(
+		 * "https://api.open-meteo.com/v1/forecast?latitude=30.04&longitude=31.24&current=temperature_2m"
+		 * )); } catch (Exception e) { System.out.println(e.getMessage()); }
+		 * JDBCConnectionUtil jdbcConnectionUtil = new JDBCConnectionUtil();
+		 * 
+		 * jdbcConnectionUtil.fillWeatherTables();
+		 */
+	
 		
-		jdbcConnectionUtil.fillWeatherTables();
-
+		
+		
+		
 	}
 }
