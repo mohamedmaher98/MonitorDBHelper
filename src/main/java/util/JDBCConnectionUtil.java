@@ -220,7 +220,7 @@ public class JDBCConnectionUtil
         boolean f = true;
 
         List<Temp> last10reads = new ArrayList<Temp>();
-        String sql = "select TEMP  , reading_time \r\n" + "FROM (\r\n" + "    SELECT TEMP  , reading_time  \r\n"
+        String sql = "select TEMP  , RECORDED_AT \r\n" + "FROM (\r\n" + "    SELECT TEMP  , RECORDED_AT  \r\n"
                 + "    FROM Weather_readingS \r\n" + "    ORDER BY id DESC\r\n" + ") \r\n" + "WHERE ROWNUM <= 10";
 
         String lastErrorMessageSql = "SELECT ERRO_MESSAGE FROM (SELECT ERRO_MESSAGE FROM WEATHER_RUNS ORDER BY ID DESC) WHERE ROWNUM =1";
@@ -240,10 +240,10 @@ public class JDBCConnectionUtil
                 if (f)
                 {
                     viewPage.setLastTemp(res.getString("Temp"));
-                    viewPage.setLastTime(res.getString("Reading_Time"));
+                    viewPage.setLastTime(res.getString("RECORDED_AT"));
                 }
                 temp.setTemp(res.getString("Temp"));
-                temp.setTime(res.getString("Reading_Time"));
+                temp.setTime(res.getString("RECORDED_AT"));
                 last10reads.add(temp);
                 f = false;
             }
@@ -260,6 +260,7 @@ public class JDBCConnectionUtil
 
         }
         return viewPage;
-    }
-
+    }    
+    
+    
 }
