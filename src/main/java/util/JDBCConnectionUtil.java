@@ -1,5 +1,6 @@
 package util;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -115,34 +116,62 @@ public class JDBCConnectionUtil
         WeatherRuns runs = new WeatherRuns();
         String insetInWeatherReading = "INSERT INTO WEATHER_READINGS(LATU, LOGU, TEMP,READING_TIME, RECORDED_AT) values  (?,?,?,?,?)";
         String insetInWeatherRuns = "INSERT INTO WEATHER_RUNS(start_date, reading_duration, is_success,erro_message) values  (?,?,?,?)";
+        int count = 0;
         long before = System.currentTimeMillis();
         runs.setStartDate(LocalDateTime.now());
-        try
+        while (count < 3)
         {
-
-            textFromClient = urlUtil.urlToText(url);
-
-            runs.setSuccess(true);
-        } catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-            runs.setSuccess(false);
-            runs.setErrorMassage(e.getMessage());
-            return;
-        } finally
-        {
-            runs.setReadingDuration((int) (System.currentTimeMillis() - before));
-
-            try (Connection conn = getConnection();
-                    PreparedStatement runsStatement = conn.prepareStatement(insetInWeatherRuns))
+            count++;
+            try
             {
-                fillweatherRuns(runsStatement, runs);
-            } catch (SQLException e)
+
+                textFromClient = urlUtil.urlToText(url);
+                runs.setSuccess(true);
+                break;
+            } catch (TemporaryApiException e)
             {
-                System.out.println("could not save the run: " + e.getMessage());
+                System.out.println(e.getMessage());
+                runs.setSuccess(false);
+                runs.setErrorMassage(e.getMessage());
+                if (count<3)
+                {
+                    try
+                    {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e1)
+                    {
+
+                        break;
+                    }
+
+                }
+                
+            } catch (IOException e)
+            {
+                System.out.println(e.getMessage());
+                runs.setSuccess(false);
+                runs.setErrorMassage(e.getMessage());
+                break;
+
             }
         }
 
+        runs.setReadingDuration((int) (System.currentTimeMillis() - before));
+
+        try (Connection conn = getConnection();
+                PreparedStatement runsStatement = conn.prepareStatement(insetInWeatherRuns))
+        {
+            fillweatherRuns(runsStatement, runs);
+        } catch (SQLException e)
+        {
+            System.out.println("could not save the run: " + e.getMessage());
+        }
+    
+
+        if (textFromClient == null)
+        {
+            return;
+        }
         ObjectMapper mapper = new ObjectMapper();
         JsonNode tree = null;
         try
@@ -260,7 +289,7 @@ public class JDBCConnectionUtil
 
         }
         return viewPage;
-    }    
-    
-    
+    }
+
+
 }
